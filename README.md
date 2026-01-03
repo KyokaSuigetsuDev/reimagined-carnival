@@ -1,6 +1,5 @@
 # reimagined-carnival
 calculator
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
