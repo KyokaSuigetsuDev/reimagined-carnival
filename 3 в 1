@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой калькулятор</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .calculator { background: #1a1a1a; border-radius: 20px; padding: 25px; width: 100%; max-width: 400px; }
+        .display { background: #2d2d2d; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: right; min-height: 100px; color: white; font-size: 2.5rem; }
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .btn { border: none; border-radius: 10px; padding: 20px; font-size: 1.3rem; color: white; background: #333; cursor: pointer; }
+        .operation { background: #ff9500; }
+        .clear { background: #a6a6a6; color: black; }
+        .equals { background: #ff9500; grid-row: span 2; }
+        .zero { grid-column: span 2; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn clear" onclick="clearAll()">AC</button>
+            <button class="btn" onclick="deleteLast()">⌫</button>
+            <button class="btn operation" onclick="appendOperation('/')">/</button>
+            <button class="btn operation" onclick="appendOperation('*')">×</button>
+            
+            <button class="btn" onclick="appendNumber('7')">7</button>
+            <button class="btn" onclick="appendNumber('8')">8</button>
+            <button class="btn" onclick="appendNumber('9')">9</button>
+            <button class="btn operation" onclick="appendOperation('-')">-</button>
+            
+            <button class="btn" onclick="appendNumber('4')">4</button>
+            <button class="btn" onclick="appendNumber('5')">5</button>
+            <button class="btn" onclick="appendNumber('6')">6</button>
+            <button class="btn operation" onclick="appendOperation('+')">+</button>
+            
+            <button class="btn" onclick="appendNumber('1')">1</button>
+            <button class="btn" onclick="appendNumber('2')">2</button>
+            <button class="btn" onclick="appendNumber('3')">3</button>
+            <button class="btn equals" onclick="calculate()">=</button>
+            
+            <button class="btn zero" onclick="appendNumber('0')">0</button>
+            <button class="btn" onclick="appendDecimal()">.</button>
+            <button class="btn" onclick="toggleSign()">±</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let shouldReset = false;
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function appendNumber(num) {
+            if (shouldReset) {
+                currentInput = '';
+                shouldReset = false;
+            }
+            
+            if (currentInput === '0' && num !== '.') {
+                currentInput = num;
+            } else {
+                if (currentInput.length < 12) {
+                    currentInput += num;
+                }
+            }
+            updateDisplay();
+        }
+
+        function appendOperation(op) {
+            if (currentInput === '') return;
+            if (previousInput !== '') calculate();
+            operation = op;
+            previousInput = currentInput;
+            shouldReset = true;
+        }
+
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousInput);
+            const curr = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(curr)) return;
+            
+            switch (operation) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '*': result = prev * curr; break;
+                case '/': 
+                    if (curr === 0) {
+                        alert("Ошибка: деление на ноль!");
+                        clearAll();
+                        return;
+                    }
+                    result = prev / curr; 
+                    break;
+                default: return;
+            }
+            
+            currentInput = result.toString();
+            operation = null;
+            previousInput = '';
+            shouldReset = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentInput.length === 1) {
+                currentInput = '0';
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (shouldReset) {
+                currentInput = '0';
+                shouldReset = false;
+            }
+            if (!currentInput.includes('.')) {
+                if (currentInput.length < 12) {
+                    currentInput += '.';
+                }
+            }
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentInput === '0') return;
+            if (currentInput.startsWith('-')) {
+                currentInput = currentInput.slice(1);
+            } else {
+                currentInput = '-' + currentInput;
+            }
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
